@@ -75,10 +75,6 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
         return vh;
     }
 
-    protected abstract VH onCreateNodeView(ViewGroup parent, int viewType);
-
-    protected abstract void onBindNodeViewHolder(VH viewHoler, int position);
-
     @Override
     final public int getItemViewType(int position) {
         int count = 0;
@@ -103,7 +99,7 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
 
         //跟据node的层深，改变缩进距离,从0开始计
         int layer = tree.getNodeLayerLevel(node);
-        holder.headSpace.getLayoutParams().width = layer * 40;
+        holder.headSpace.getLayoutParams().width = layer * 44;
 
         //给子类机会去绑定行数据
         onBindNodeViewHolder(holder, position);
@@ -114,6 +110,10 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
     final public int getItemCount() {
         return tree.size();
     }
+
+    protected abstract VH onCreateNodeView(ViewGroup parent, int viewType);
+
+    protected abstract void onBindNodeViewHolder(VH viewHoler, int position);
 
     public void notifyTreeItemInserted(ListTree.TreeNode parent, ListTree.TreeNode node) {
         int parentPlaneIndex = tree.getNodePlaneIndex(parent);
@@ -130,6 +130,9 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
         }
     }
 
+    /***
+     只有空格和展开收缩的图标
+     */
     public class ListTreeViewHolder extends RecyclerView.ViewHolder {
 
         protected ViewGroup containerView;
@@ -142,9 +145,13 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
         }
 
         protected void initView() {
-            arrowIcon.setOnClickListener(new View.OnClickListener() {
+            containerView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    v.setClickable(true);
+                    v.setFocusable(true);
+                    v.requestFocus();
+
                     int planePos = getAdapterPosition();
                     ListTree.TreeNode node = tree.getNodeByPlaneIndex(planePos);
                     if (node.isShowExpandIcon()) {
