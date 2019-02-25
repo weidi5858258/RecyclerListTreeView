@@ -8,24 +8,107 @@
     android:background="@android:color/holo_blue_bright"
     android:clipChildren="false"
     android:clipToPadding="false">
-        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="niuedu.com.treeviewtest.MainActivity"
-    tools:showIn="@layout/activity_main"-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"
+tools:context="niuedu.com.treeviewtest.MainActivity"
+tools:showIn="@layout/activity_main"-->
+
+    <com.niuedu.TwoDScrollView
+        android:background="@android:color/holo_green_light"
+        android:layout_width="262dp"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:background="@android:color/transparent"
+            android:id="@+id/testlayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listview"
+                android:layout_width="262dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_green_light"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+
+        </LinearLayout>
+
+    </com.niuedu.TwoDScrollView>
+
+    <!--<LinearLayout
+        android:id="@+id/testlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/listview"
-            android:layout_width="match_parent"
+            android:layout_width="262dp"
             android:layout_height="match_parent"
+            android:background="@android:color/holo_green_light"
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="true"/>
 
-        <!--<app.com.tvrecyclerview.TvRecyclerView
-            android:id="@+id/listview"
+    </LinearLayout>-->
+
+    <!--<niuedu.com.treeviewtest.MyHorizontalScrollView
+        android:id="@+id/horizontalscrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@android:color/holo_blue_bright"/>-->
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="李圆圆"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listview"
+                android:layout_width="262dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_green_light"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆"/>
+        </LinearLayout>
+    </niuedu.com.treeviewtest.MyHorizontalScrollView>-->
+
+
+    <!--<app.com.tvrecyclerview.TvRecyclerView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@android:color/holo_blue_bright"/>-->
 
 </FrameLayout>

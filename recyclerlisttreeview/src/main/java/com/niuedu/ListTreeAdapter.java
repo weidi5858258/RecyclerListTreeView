@@ -3,6 +3,7 @@ package com.niuedu;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import niuedu.com.R;
 public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHolder>
         extends RecyclerView.Adapter<VH> {
 
+    private static final String TAG = ListTreeAdapter.class.getSimpleName();
     protected ListTree tree;
 
     //展开和收起图标的Drawable资源id
@@ -76,13 +78,6 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
     }
 
     @Override
-    final public int getItemViewType(int position) {
-        int count = 0;
-        ListTree.TreeNode node = tree.getNodeByPlaneIndex(position);
-        return node.getLayoutResId();
-    }
-
-    @Override
     final public void onBindViewHolder(VH holder, int position) {
         //get node at the position
         ListTree.TreeNode node = tree.getNodeByPlaneIndex(position);
@@ -97,14 +92,25 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
             holder.arrowIcon.setImageBitmap(null);
         }
 
+        ViewGroup.LayoutParams params = holder.arrowIcon.getLayoutParams();
+
         //跟据node的层深，改变缩进距离,从0开始计
         int layer = tree.getNodeLayerLevel(node);
-        holder.headSpace.getLayoutParams().width = layer * 44;
+        int space = layer * 44;
+        holder.headSpace.getLayoutParams().width = space;
+        space += params.width + 5;
+        Log.i(TAG, "onBindViewHolder() space: " + space);
 
         //给子类机会去绑定行数据
-        onBindNodeViewHolder(holder, position);
+        onBindNodeViewHolder(holder, position, space);
     }
 
+    @Override
+    final public int getItemViewType(int position) {
+        int count = 0;
+        ListTree.TreeNode node = tree.getNodeByPlaneIndex(position);
+        return node.getLayoutResId();
+    }
 
     @Override
     final public int getItemCount() {
@@ -113,7 +119,7 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
 
     protected abstract VH onCreateNodeView(ViewGroup parent, int viewType);
 
-    protected abstract void onBindNodeViewHolder(VH viewHoler, int position);
+    protected abstract void onBindNodeViewHolder(VH viewHoler, int position, int space);
 
     public void notifyTreeItemInserted(ListTree.TreeNode parent, ListTree.TreeNode node) {
         int parentPlaneIndex = tree.getNodePlaneIndex(parent);

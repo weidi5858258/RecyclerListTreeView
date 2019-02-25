@@ -3,10 +3,12 @@ package niuedu.com.treeviewtest;
 import android.graphics.Bitmap;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -24,6 +26,7 @@ public class ExampleListTreeAdapter extends
     //记录弹出菜单是在哪个行上出现的
     private ListTree.TreeNode currentNode;
 
+    private HorizontalScrollView mHorizontalScrollView;
     private RecyclerView mRecyclerView;
     private ListTree.TreeNode mCurTreeNode;
 
@@ -31,9 +34,11 @@ public class ExampleListTreeAdapter extends
 
     //构造方法
     public ExampleListTreeAdapter(ListTree tree,
+                                  HorizontalScrollView horizontalScrollView,
                                   RecyclerView recyclerView,
                                   PopupMenu.OnMenuItemClickListener listener) {
         super(tree);
+        mHorizontalScrollView = horizontalScrollView;
         mRecyclerView = recyclerView;
         this.itemMenuClickListener = listener;
     }
@@ -63,7 +68,7 @@ public class ExampleListTreeAdapter extends
     }
 
     @Override
-    protected void onBindNodeViewHolder(BaseViewHolder holder, int position) {
+    protected void onBindNodeViewHolder(BaseViewHolder holder, int position, int space) {
 
         View view = holder.itemView;
 
@@ -76,8 +81,8 @@ public class ExampleListTreeAdapter extends
 
         //get node at the position
         ListTree.TreeNode node = tree.getNodeByPlaneIndex(position);
-        Log.i(TAG, "onBindNodeViewHolder() position: " + position+" title: "+node.getData());
-        Log.i(TAG, "onBindNodeViewHolder() selectedPosition: " + selectedPosition);
+//        Log.i(TAG, "onBindNodeViewHolder() position: " + position+" title: "+node.getData());
+//        Log.i(TAG, "onBindNodeViewHolder() selectedPosition: " + selectedPosition);
 
         if (node.getLayoutResId() == R.layout.contacts_group_item) {
             //group node
@@ -94,6 +99,23 @@ public class ExampleListTreeAdapter extends
             ContactViewHolder cvh = (ContactViewHolder) holder;
             cvh.imageViewHead.setImageBitmap(info.getBitmap());
             cvh.textViewTitle.setText(info.getTitle());
+            TextPaint textPaint = cvh.textViewTitle.getPaint();
+            int textPaintWidth = (int) textPaint.measureText(cvh.textViewTitle.getText().toString());
+
+            ViewGroup.LayoutParams params = cvh.imageViewHead.getLayoutParams();
+            Log.i(TAG, "onBindNodeViewHolder() title: " + info.getTitle());
+//            Log.i(TAG, "onBindNodeViewHolder() params.width: " + params.width);
+            //            Log.i(TAG, "onBindNodeViewHolder() textPaintWidth: " + textPaintWidth);
+            int totalWidth = space + params.width + 20 + textPaintWidth;
+            Log.i(TAG, "onBindNodeViewHolder() totalWidth: " + totalWidth);
+
+            if(524-totalWidth <= 44){
+                // 移动
+//                mRecyclerView.scrollBy(0, -110);
+//                mRecyclerView.smoothScrollBy(550, 110);
+//                mHorizontalScrollView.smoothScrollBy(1500, 0);
+            }
+
 //            cvh.aSwitch.setChecked(node.isChecked());
         }
 
@@ -184,9 +206,9 @@ public class ExampleListTreeAdapter extends
                         itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_red_light));
                         mCurTreeNode = node;
                     }else{
-                        itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_blue_bright));
+                        itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_green_light));
                     }
-                    Log.i(TAG, "Group onFocusChange() " + b + " " + node.getData());
+//                    Log.i(TAG, "Group onFocusChange() " + b + " " + node.getData());
                 }
             });
 
@@ -245,9 +267,9 @@ public class ExampleListTreeAdapter extends
                         itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_red_light));
                         mCurTreeNode = node;
                     }else{
-                        itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_blue_bright));
+                        itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_green_light));
                     }
-                    Log.i(TAG, "Member onFocusChange() " + b + " " + node.getData());
+//                    Log.i(TAG, "Member onFocusChange() " + b + " " + node.getData());
                 }
             });
 

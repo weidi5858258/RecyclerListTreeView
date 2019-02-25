@@ -11,9 +11,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 
 import com.niuedu.ListTree;
 
@@ -26,17 +29,25 @@ public class MainActivity extends AppCompatActivity
     private ListTree tree = new ListTree();
     //从ListTreeAdapter派生的Adapter
     ExampleListTreeAdapter adapter;
+    HorizontalScrollView mHorizontalScrollView;
+    RecyclerView mRecyclerView;
+    LinearLayout mTestLayout;
+    LinearLayoutManager mLinearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
-//        setContentView(R.layout.activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        //        setContentView(R.layout.activity_main);
+        //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //        setSupportActionBar(toolbar);
 
         //使用Android原生的RecyclerView即可
-        RecyclerView listView = findViewById(R.id.listview);
+//        mHorizontalScrollView = findViewById(R.id.horizontalscrollview);
+//        mHorizontalScrollView.setSmoothScrollingEnabled(true);
+        mTestLayout = findViewById(R.id.testlayout);
+        mRecyclerView = findViewById(R.id.listview);
+        mRecyclerView.setNestedScrollingEnabled(false);
 
         //创建后台数据：一棵树
         //创建组们，是root node，所有parent为null
@@ -46,19 +57,16 @@ public class MainActivity extends AppCompatActivity
         ListTree.TreeNode groupNode4 = tree.addNode(null, "家人", R.layout.contacts_group_item);
         ListTree.TreeNode groupNode5 = tree.addNode(null, "同学", R.layout.contacts_group_item);
 
-        //第二层
+        //第二层 contact被添加到groupNode2,groupNode5中
         ExampleListTreeAdapter.ContactInfo contact;
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
         contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "王二");
-        ListTree.TreeNode contactNode1 = tree.addNode(groupNode2, contact, R.layout.contacts_contact_item);
-        ListTree.TreeNode contactNode2 = tree.addNode(groupNode5, contact, R.layout.contacts_contact_item);
-        //再添加一个
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
-        contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "王三");
-        tree.addNode(groupNode2, contact, R.layout.contacts_contact_item);
-        tree.addNode(groupNode5, contact, R.layout.contacts_contact_item);
+        ListTree.TreeNode contactNode1 = tree.addNode(groupNode2, contact, R.layout
+                .contacts_contact_item);
+        ListTree.TreeNode contactNode2 = tree.addNode(groupNode5, contact, R.layout
+                .contacts_contact_item);
 
-        //第三层
+        //第三层 contact被添加到contactNode1中
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
         contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "东邪");
         ListTree.TreeNode n = tree.addNode(contactNode1, contact, R.layout.contacts_contact_item);
@@ -69,12 +77,44 @@ public class MainActivity extends AppCompatActivity
         n = tree.addNode(contactNode1, contact, R.layout.contacts_contact_item);
         n.setShowExpandIcon(false);
 
-        adapter = new ExampleListTreeAdapter(tree, listView, this);
-        listView.setLayoutManager(new LinearLayoutManager(this));
-        listView.setAdapter(adapter);
+        //再添加一个
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+        contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆王三");
+        ListTree.TreeNode wang3 = tree.addNode(groupNode2, contact, R.layout.contacts_contact_item);
+        tree.addNode(groupNode5, contact, R.layout.contacts_contact_item);
 
-        listView.setFocusable(true);
-        listView.requestFocus();
+        /*bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+        contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "王四");
+        ListTree.TreeNode wang4 = tree.addNode(wang3, contact, R.layout.contacts_contact_item);
+
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+        contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "王五");
+        ListTree.TreeNode wang5 = tree.addNode(wang4, contact, R.layout.contacts_contact_item);
+
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+        contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "王六");
+        ListTree.TreeNode wang6 = tree.addNode(wang5, contact, R.layout.contacts_contact_item);*/
+
+        ListTree.TreeNode tempNode = null;
+        for (int i = 4; i < 50; i++) {
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+            contact = new ExampleListTreeAdapter.ContactInfo(bitmap, "李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆李圆圆王 " + i);
+            if (i == 4) {
+                tempNode = tree.addNode(wang3, contact, R.layout.contacts_contact_item);
+            } else {
+                tempNode = tree.addNode(tempNode, contact, R.layout.contacts_contact_item);
+            }
+        }
+
+
+        adapter = new ExampleListTreeAdapter(tree,mHorizontalScrollView, mRecyclerView, this);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        Log.i(TAG, "onCreate() canHori: " + mLinearLayoutManager.canScrollHorizontally());
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setAdapter(adapter);
+
+        mRecyclerView.setFocusable(true);
+        mRecyclerView.requestFocus();
 
         /*new Handler().postDelayed(new Runnable() {
             @Override
@@ -82,6 +122,25 @@ public class MainActivity extends AppCompatActivity
                 adapter.scrollToRunningAppPosition();
             }
         }, 5000);*/
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                mTestLayout.scrollBy(-30, 0);
+//                mRecyclerView.scrollBy(0, 30);
+//                mRecyclerView.smoothScrollBy(30, 0);
+//                mLinearLayoutManager.scrollHorizontallyBy(30, mRecyclerView.new Recycler(), new RecyclerView.State());
+                return true;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                mTestLayout.scrollBy(30, 0);
+//                mRecyclerView.scrollBy(0, -30);
+//                mRecyclerView.smoothScrollBy(-30, 0);
+//                mLinearLayoutManager.scrollHorizontallyBy(-30, mRecyclerView.new Recycler(), new RecyclerView.State());
+                return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
@@ -113,10 +172,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_add_item:
                 //向当前行增加一个儿子
                 ListTree.TreeNode node = adapter.getCurrentNode();
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable
+                        .contacts_normal);
                 ExampleListTreeAdapter.ContactInfo contact = new ExampleListTreeAdapter.ContactInfo(
                         bitmap, "New contact");
-                ListTree.TreeNode childNode = tree.addNode(node, contact, R.layout.contacts_contact_item);
+                ListTree.TreeNode childNode = tree.addNode(node, contact, R.layout
+                        .contacts_contact_item);
                 adapter.notifyTreeItemInserted(node, childNode);
                 return true;
             case R.id.action_clear_children:
