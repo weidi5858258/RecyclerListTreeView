@@ -1,5 +1,6 @@
 package niuedu.com.treeviewtest;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -21,11 +22,8 @@ public class ExampleListTreeAdapter extends
 
     private static final String TAG = ExampleListTreeAdapter.class.getSimpleName();
 
-    //行上弹出菜单的侦听器
-    private PopupMenu.OnMenuItemClickListener itemMenuClickListener;
     //记录弹出菜单是在哪个行上出现的
     private ListTree.TreeNode currentNode;
-
     private HorizontalScrollView mHorizontalScrollView;
     private RecyclerView mRecyclerView;
     private ListTree.TreeNode mCurTreeNode;
@@ -33,14 +31,13 @@ public class ExampleListTreeAdapter extends
     private int selectedPosition = -1;
 
     //构造方法
-    public ExampleListTreeAdapter(ListTree tree,
+    public ExampleListTreeAdapter(Context context,
+                                  ListTree tree,
                                   HorizontalScrollView horizontalScrollView,
-                                  RecyclerView recyclerView,
-                                  PopupMenu.OnMenuItemClickListener listener) {
-        super(tree);
+                                  RecyclerView recyclerView) {
+        super(context, tree);
         mHorizontalScrollView = horizontalScrollView;
         mRecyclerView = recyclerView;
-        this.itemMenuClickListener = listener;
     }
 
     public ListTree.TreeNode getCurrentNode() {
@@ -49,7 +46,7 @@ public class ExampleListTreeAdapter extends
 
     @Override
     protected BaseViewHolder onCreateNodeView(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        LayoutInflater inflater = LayoutInflater.from(mContext);
 
         //创建不同的行View
         if (viewType == R.layout.contacts_group_item) {
@@ -69,13 +66,10 @@ public class ExampleListTreeAdapter extends
 
     @Override
     protected void onBindNodeViewHolder(BaseViewHolder holder, int position, int space) {
-
         View view = holder.itemView;
-
         view.setClickable(true);
         view.setFocusable(true);
-
-        if(position==0){
+        if (position == 0) {
             view.requestFocus();
         }
 
@@ -109,7 +103,7 @@ public class ExampleListTreeAdapter extends
             int totalWidth = space + params.width + 20 + textPaintWidth;
             Log.i(TAG, "onBindNodeViewHolder() totalWidth: " + totalWidth);
 
-            if(524-totalWidth <= 44){
+            if (524 - totalWidth <= 44) {
                 // 移动
 //                mRecyclerView.scrollBy(0, -110);
 //                mRecyclerView.smoothScrollBy(550, 110);
@@ -182,30 +176,21 @@ public class ExampleListTreeAdapter extends
     private class GroupViewHolder extends BaseViewHolder {
 
         TextView textViewTitle;
-        TextView textViewCount;
-        Switch aSwitch;
-        TextView textViewMenu;
 
         public GroupViewHolder(final View itemView) {
             super(itemView);
 
             textViewTitle = itemView.findViewById(R.id.textViewTitle);
-//            textViewCount = itemView.findViewById(R.id.textViewCount);
-//            aSwitch = itemView.findViewById(R.id.switchChecked);
-//            textViewMenu = itemView.findViewById(R.id.textViewMenu);
-//            textViewCount.setVisibility(View.GONE);
-//            aSwitch.setVisibility(View.GONE);
-//            textViewMenu.setVisibility(View.GONE);
 
             itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean b) {
                     int planeIndex = getAdapterPosition();
                     ListTree.TreeNode node = tree.getNodeByPlaneIndex(planeIndex);
-                    if(b){
+                    if (b) {
                         itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_red_light));
                         mCurTreeNode = node;
-                    }else{
+                    } else {
                         itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_green_light));
                     }
 //                    Log.i(TAG, "Group onFocusChange() " + b + " " + node.getData());
@@ -245,28 +230,22 @@ public class ExampleListTreeAdapter extends
     private class ContactViewHolder extends BaseViewHolder {
         ImageView imageViewHead;
         TextView textViewTitle;
-        TextView textViewDetail;
-        Switch aSwitch;
 
         public ContactViewHolder(final View itemView) {
             super(itemView);
 
             imageViewHead = itemView.findViewById(R.id.imageViewHead);
             textViewTitle = itemView.findViewById(R.id.textViewTitle);
-//            textViewDetail = itemView.findViewById(R.id.textViewDetail);
-//            aSwitch = itemView.findViewById(R.id.switchChecked);
-//            textViewDetail.setVisibility(View.GONE);
-//            aSwitch.setVisibility(View.GONE);
 
             itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean b) {
                     int planeIndex = getAdapterPosition();
                     ListTree.TreeNode node = tree.getNodeByPlaneIndex(planeIndex);
-                    if(b){
+                    if (b) {
                         itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_red_light));
                         mCurTreeNode = node;
-                    }else{
+                    } else {
                         itemView.setBackgroundColor(view.getContext().getResources().getColor(android.R.color.holo_green_light));
                     }
 //                    Log.i(TAG, "Member onFocusChange() " + b + " " + node.getData());

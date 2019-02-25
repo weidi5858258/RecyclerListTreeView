@@ -1,7 +1,6 @@
 package com.niuedu;
 
 import android.util.Pair;
-import android.util.Range;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.Stack;
  * 是为牛逼树
  */
 public class ListTree {
+
     public class TreeNode {
         //实际的数据
         private Object data;
@@ -39,21 +39,21 @@ public class ListTree {
         //其所有子孙们的数量，这个在收起必须为0,在展开时才有效
         private int descendantCount = 0;
 
-        private TreeNode parent = null;
+        private TreeNode parentNode = null;
 
         private boolean checked;
 
         //是否显示展开－收起图标
         private boolean showExpandIcon = true;
 
-        //当此节点折叠时，其子孙们不能再位于List中，所以移到这里来保存。
+        //当此节点折叠时，其子孙们不能再位于mTreeNodes中，所以移到这里来保存。
         //当此节点展开时，再移到List中
         private List<TreeNode> collapseDescendant;
-        private boolean expand;
+        private boolean mIsExpanded;
         private int layerLevel;
 
-        private TreeNode(TreeNode parent, Object data, int layoutResId) {
-            this.parent = parent;
+        private TreeNode(TreeNode parentNode, Object data, int layoutResId) {
+            this.parentNode = parentNode;
             this.data = data;
             this.layoutResId = layoutResId;
         }
@@ -74,12 +74,12 @@ public class ListTree {
             return ret;
         }
 
-        public TreeNode getParent() {
-            return parent;
+        public TreeNode getParentNode() {
+            return parentNode;
         }
 
-        public void setExpand(boolean expand) {
-            this.expand = expand;
+        public void setIsExpanded(boolean isExpanded) {
+            this.mIsExpanded = isExpanded;
         }
 
         public Object getData() {
@@ -90,8 +90,8 @@ public class ListTree {
             return layoutResId;
         }
 
-        public boolean isExpand() {
-            return expand;
+        public boolean isExpanded() {
+            return mIsExpanded;
         }
 
         public boolean isChecked() {
@@ -111,11 +111,11 @@ public class ListTree {
         }
 
         public void setDescendantChecked(boolean b) {
-            if(this.collapseDescendant==null){
+            if (this.collapseDescendant == null) {
                 return;
             }
 
-            if (this.expand) {
+            if (this.mIsExpanded) {
                 throw new IllegalStateException("Only can invoke when node is collapsed");
             }
 
@@ -153,14 +153,14 @@ public class ListTree {
         private Stack<TreeEnumInfo> treeEnumStack = new Stack<>();
 
         private EnumPos() {
-            treeEnumStack.push(new TreeEnumInfo(nodes, 0));
+            treeEnumStack.push(new TreeEnumInfo(mTreeNodes, 0));
         }
     }
 
-    private int rootNodesCount;
+    private int rootNodesCount = 0;
 
     //用List保存整棵树
-    private List<TreeNode> nodes = new ArrayList<>();
+    private List<TreeNode> mTreeNodes = new ArrayList<>();
 
 
     /**
@@ -171,26 +171,27 @@ public class ListTree {
      */
     public TreeNode addNode(TreeNode parent, Object data, int layoutResId) {
         TreeNode node = new TreeNode(parent, data, layoutResId);
+
         if (parent == null) {
             //root node,append to end
-            nodes.add(node);
+            mTreeNodes.add(node);
             rootNodesCount++;
             return node;
         }
 
         //插入非root node，有爹
-        if (parent.isExpand()) {
+        if (parent.isExpanded()) {
             //如果parent当前状态是展开的
-            int index = nodes.indexOf(parent);
+            int index = mTreeNodes.indexOf(parent);
             index += parent.descendantCount;
 
             //插到最后一个子孙的后面
-            nodes.add(index + 1, node);
+            mTreeNodes.add(index + 1, node);
             //需追溯它所有的长辈，为每个都更新其子孙数量
             TreeNode ancestor = parent;
             while (ancestor != null) {
                 ancestor.descendantCount++;
-                ancestor = ancestor.parent;
+                ancestor = ancestor.parentNode;
             }
         } else {
             //如果parent当前状态是收起的
@@ -213,7 +214,7 @@ public class ListTree {
 //    public List<TreeNode> getNodeList(){
 //        //如果有节点处于收起状态，底层是List中就不能包含所有的Item
 //        //
-//        return this.nodes;
+//        return this.mTreeNodes;
 //    }
 
     /**
@@ -224,7 +225,7 @@ public class ListTree {
      * @return 根上第一个node的位置，如果为null，则不能继续调用getNextNode()
      */
     public EnumPos startEnumNode() {
-        if (nodes.isEmpty()) {
+        if (mTreeNodes.isEmpty()) {
             return null;
         }
 
@@ -234,13 +235,14 @@ public class ListTree {
     /**
      * 用于遍历，获取下一个节点
      * 注意！！返回的与参数其实是一个对象！
+     *
      * @param pos 当前节点的位置，既是输入参数也是输出参数
      * @return 返回的其实是改变了内部属性的参数pos，当返回为null时，需停止遍历
      */
     public EnumPos enumNext(EnumPos pos) {
         EnumPos.TreeEnumInfo info = pos.treeEnumStack.peek();
         TreeNode curNode = info.nodeList.get(info.planeIndex);
-        if (curNode.getChildrenCount() > 0 && !curNode.isExpand()) {
+        if (curNode.getChildrenCount() > 0 && !curNode.isExpanded()) {
             //如果这个Node没展开且有儿子，则需要遍历它的儿子
             pos.treeEnumStack.push(pos.new TreeEnumInfo(curNode.collapseDescendant, 0));
             return pos;
@@ -286,7 +288,7 @@ public class ListTree {
                 return null;
             }
 
-            nodes.add(position, node);
+            mTreeNodes.add(position, node);
             rootNodesCount++;
             return node;
         }
@@ -297,15 +299,15 @@ public class ListTree {
             return null;
         }
 
-        if (parent.isExpand()) {
+        if (parent.isExpanded()) {
             int planePosition = getNodePlaneIndexByIndex(parent, position);
-            nodes.add(planePosition, node);
+            mTreeNodes.add(planePosition, node);
 
             //需追溯它所有的长辈，为每个都更新其子孙数量
             TreeNode ancestor = parent;
             while (ancestor != null) {
                 ancestor.descendantCount++;
-                ancestor = ancestor.parent;
+                ancestor = ancestor.parentNode;
             }
         } else {
             if (parent.collapseDescendant == null) {
@@ -324,8 +326,8 @@ public class ListTree {
      * @return plane index,<0 means exceed range
      */
     private int getNodePlaneIndexByIndex(TreeNode parent, int index) {
-        if (!parent.isExpand()) {
-            throw new IllegalStateException("Only invoke when parent is expand");
+        if (!parent.isExpanded()) {
+            throw new IllegalStateException("Only invoke when parentNode is mIsExpanded");
         }
 
         int range = 0;
@@ -343,8 +345,8 @@ public class ListTree {
                 return planeIndex;
             } else {
                 //指向下一个root node
-                TreeNode node = nodes.get(planeIndex);
-                planeIndex += node.isExpand() ? node.descendantCount : 0;
+                TreeNode node = mTreeNodes.get(planeIndex);
+                planeIndex += node.isExpanded() ? node.descendantCount : 0;
                 planeIndex++;
             }
         }
@@ -353,24 +355,24 @@ public class ListTree {
     }
 
     //返回被删除了Item的start plane index和count
-    public Pair<Integer,Integer> clearDescendant(TreeNode treeNode) {
+    public Pair<Integer, Integer> clearDescendant(TreeNode treeNode) {
         if (treeNode.childrenCount == 0) {
             //如果没有儿子，无法收起
             return null;
         }
 
         //如果有儿子，把子孙们从List中取出来
-        int nodePlaneIndex = nodes.indexOf(treeNode);
-        Pair<Integer,Integer> ret = new Pair<Integer,Integer>(
-                nodePlaneIndex+1, treeNode.descendantCount);
-        List<TreeNode> descendant = nodes.subList(
+        int nodePlaneIndex = mTreeNodes.indexOf(treeNode);
+        Pair<Integer, Integer> ret = new Pair<Integer, Integer>(
+                nodePlaneIndex + 1, treeNode.descendantCount);
+        List<TreeNode> descendant = mTreeNodes.subList(
                 nodePlaneIndex + 1,
                 nodePlaneIndex + 1 + treeNode.descendantCount);
         descendant.clear();
 
-        treeNode.childrenCount=0;
-        treeNode.descendantCount=0;
-        treeNode.collapseDescendant=null;
+        treeNode.childrenCount = 0;
+        treeNode.descendantCount = 0;
+        treeNode.collapseDescendant = null;
 
         return ret;
     }
@@ -381,12 +383,12 @@ public class ListTree {
      * @param node node to be removed
      */
     public void removeNode(TreeNode node) {
-        TreeNode parent = node.parent;
-        if (parent==null || parent.isExpand()) {
+        TreeNode parent = node.parentNode;
+        if (parent == null || parent.isExpanded()) {
             int descendantCount = node.descendantCount;
-            int index = nodes.indexOf(node);
-            List ret = nodes.subList(index, index + descendantCount + 1);
-            ret.clear();//remove nodes and its descendant
+            int index = mTreeNodes.indexOf(node);
+            List ret = mTreeNodes.subList(index, index + descendantCount + 1);
+            ret.clear();//remove mTreeNodes and its descendant
 
             if (parent != null) {
                 parent.childrenCount++;
@@ -395,7 +397,7 @@ public class ListTree {
                 TreeNode ancestor = parent;
                 while (ancestor != null) {
                     ancestor.descendantCount -= descendantCount;
-                    ancestor = ancestor.parent;
+                    ancestor = ancestor.parentNode;
                 }
             } else {
                 rootNodesCount--;
@@ -407,27 +409,27 @@ public class ListTree {
                 parent.childrenCount++;
                 parent.descendantCount--;
             }
-            nodes.remove(node);
+            mTreeNodes.remove(node);
         }
     }
 
     //获取节点在列表中的索引
     public TreeNode getNodeByPlaneIndex(int index) {
-        return nodes.get(index);
+        return mTreeNodes.get(index);
     }
 
     public int getNodePlaneIndex(TreeNode node) {
-        return nodes.indexOf(node);
+        return mTreeNodes.indexOf(node);
     }
 
     public int expandNode(TreeNode node) {
-        int nodePlaneIndex=nodes.indexOf(node);
+        int nodePlaneIndex = mTreeNodes.indexOf(node);
 
-        if (node.isExpand()) {
-            throw new IllegalStateException("Only invoke when parent is collesped");
+        if (node.isExpanded()) {
+            throw new IllegalStateException("Only invoke when parentNode is collesped");
         }
 
-        node.setExpand(true);
+        node.setIsExpanded(true);
         if (node.childrenCount == 0) {
             //如果没有儿子，无法展开
             return 0;
@@ -435,31 +437,31 @@ public class ListTree {
 
         //如果有儿子，把儿子们移到List中
         List<TreeNode> descendant = node.extractDescendant();
-        nodes.addAll(nodePlaneIndex + 1, descendant);
+        mTreeNodes.addAll(nodePlaneIndex + 1, descendant);
         node.descendantCount = descendant.size();
 
         //需追溯它所有的长辈，为每个都更新其子孙数量
-        TreeNode ancestor = node.parent;
+        TreeNode ancestor = node.parentNode;
         while (ancestor != null) {
             ancestor.descendantCount += node.descendantCount;
-            ancestor = ancestor.parent;
+            ancestor = ancestor.parentNode;
         }
 
         return node.descendantCount;
     }
 
     public int expandNode(int nodePlaneIndex) {
-        TreeNode node = nodes.get(nodePlaneIndex);
+        TreeNode node = mTreeNodes.get(nodePlaneIndex);
         return expandNode(node);
     }
 
     //返回影响到的Node们的数量
     public int collapseNode(TreeNode node) {
-        int nodePlaneIndex = nodes.indexOf(node);
-        if (!node.isExpand()) {
-            throw new IllegalStateException("Only invoke when parent is expand");
+        int nodePlaneIndex = mTreeNodes.indexOf(node);
+        if (!node.isExpanded()) {
+            throw new IllegalStateException("Only invoke when parentNode is mIsExpanded");
         }
-        node.setExpand(false);
+        node.setIsExpanded(false);
 
         if (node.childrenCount == 0) {
             //如果没有儿子，无法收起
@@ -467,7 +469,7 @@ public class ListTree {
         }
 
         //如果有儿子，把子孙们从List中取出自己保存
-        List<TreeNode> descendant = nodes.subList(
+        List<TreeNode> descendant = mTreeNodes.subList(
                 nodePlaneIndex + 1, nodePlaneIndex + 1 + node.descendantCount);
 
         node.retractDescendant((List<TreeNode>) descendant);
@@ -475,26 +477,27 @@ public class ListTree {
         descendant.clear();
 
         //需追溯它所有的长辈，为每个都更新其子孙数量
-        TreeNode ancestor = node.parent;
+        TreeNode ancestor = node.parentNode;
         while (ancestor != null) {
             ancestor.descendantCount -= node.descendantCount;
-            ancestor = ancestor.parent;
+            ancestor = ancestor.parentNode;
         }
 
         return node.descendantCount;
     }
+
     public int collapseNode(int nodePlaneIndex) {
-        TreeNode node = nodes.get(nodePlaneIndex);
+        TreeNode node = mTreeNodes.get(nodePlaneIndex);
         return collapseNode(node);
     }
 
     public int setDescendantChecked(int nodePlaneIndex, boolean b) {
-        TreeNode node = nodes.get(nodePlaneIndex);
-        if (node.isExpand()) {
+        TreeNode node = mTreeNodes.get(nodePlaneIndex);
+        if (node.isExpanded()) {
             int start = nodePlaneIndex + 1;
             int count = node.descendantCount;
             for (int i = start; i < start + count; i++) {
-                nodes.get(i).setChecked(b);
+                mTreeNodes.get(i).setChecked(b);
             }
             return node.descendantCount;
         } else {
@@ -504,15 +507,15 @@ public class ListTree {
     }
 
     public int size() {
-        return nodes.size();
+        return mTreeNodes.size();
     }
 
     public int getNodeLayerLevel(TreeNode node) {
         int count = 0;
-        TreeNode parent = node.parent;
+        TreeNode parent = node.parentNode;
         while (parent != null) {
             count++;
-            parent = parent.parent;
+            parent = parent.parentNode;
         }
         return count;
     }
@@ -521,27 +524,27 @@ public class ListTree {
         //从前往后遍历，先找到的是父辈，如果父辈被删，其子孙必然被删掉
         //所以只需删一个分支上的最外层被选中的就可以。
         ArrayList<TreeNode> nodeToDel = new ArrayList<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            TreeNode node = nodes.get(i);
+        for (int i = 0; i < mTreeNodes.size(); i++) {
+            TreeNode node = mTreeNodes.get(i);
             if (node.isChecked()) {
-                List<TreeNode> descendant = nodes.subList(i, i + 1 + node.descendantCount);
+                List<TreeNode> descendant = mTreeNodes.subList(i, i + 1 + node.descendantCount);
                 nodeToDel.addAll(descendant);
 
                 //更新其爸爸的儿子数，更新其父辈的子孙数
-                TreeNode ancestor = node.parent;
+                TreeNode ancestor = node.parentNode;
                 if (ancestor != null) {
                     ancestor.childrenCount--;
                 }
 
                 while (ancestor != null) {
                     ancestor.descendantCount -= node.descendantCount + 1;
-                    ancestor = ancestor.parent;
+                    ancestor = ancestor.parentNode;
                 }
 
                 i += node.descendantCount;
             }
         }
 
-        nodes.removeAll(nodeToDel);
+        mTreeNodes.removeAll(nodeToDel);
     }
 }

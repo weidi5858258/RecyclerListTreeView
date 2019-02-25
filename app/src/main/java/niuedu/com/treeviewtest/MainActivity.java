@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        adapter = new ExampleListTreeAdapter(tree,mHorizontalScrollView, mRecyclerView, this);
+        adapter = new ExampleListTreeAdapter(getApplicationContext(), tree,mHorizontalScrollView, mRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
         Log.i(TAG, "onCreate() canHori: " + mLinearLayoutManager.canScrollHorizontally());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
