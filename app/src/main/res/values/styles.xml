@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parentNode="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" mParentNode="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -13,8 +13,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parentNode="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" mParentNode="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parentNode="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" mParentNode="ThemeOverlay.AppCompat.Light" />
 
 </resources>

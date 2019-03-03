@@ -211,7 +211,7 @@ public class ListTree {
 //     * Get a List witch conatins all items;
 //     * @return List
 //     */
-//    public List<TreeNode> getNodeList(){
+//    public List<ItemNode> getNodeList(){
 //        //如果有节点处于收起状态，底层是List中就不能包含所有的Item
 //        //
 //        return this.mTreeNodes;

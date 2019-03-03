@@ -24,7 +24,6 @@ public class ExampleListTreeAdapter extends
 
     //记录弹出菜单是在哪个行上出现的
     private ListTree.TreeNode currentNode;
-    private HorizontalScrollView mHorizontalScrollView;
     private RecyclerView mRecyclerView;
     private ListTree.TreeNode mCurTreeNode;
 
@@ -33,10 +32,8 @@ public class ExampleListTreeAdapter extends
     //构造方法
     public ExampleListTreeAdapter(Context context,
                                   ListTree tree,
-                                  HorizontalScrollView horizontalScrollView,
                                   RecyclerView recyclerView) {
         super(context, tree);
-        mHorizontalScrollView = horizontalScrollView;
         mRecyclerView = recyclerView;
     }
 
@@ -202,7 +199,7 @@ public class ExampleListTreeAdapter extends
                 @Override
                 public void onClick(View view) {
                     int planeIndex = getAdapterPosition();
-                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(planeIndex);
+                    ListTree.ItemNode node = tree.getNodeByPlaneIndex(planeIndex);
                     node.setChecked(!node.isChecked());
                     //改变所有的子孙们的状态
                     int count = tree.setDescendantChecked(planeIndex, node.isChecked());
@@ -215,7 +212,7 @@ public class ExampleListTreeAdapter extends
                 @Override
                 public void onClick(View v) {
                     int nodePlaneIndex = getAdapterPosition();
-                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(nodePlaneIndex);
+                    ListTree.ItemNode node = tree.getNodeByPlaneIndex(nodePlaneIndex);
                     currentNode = node;
                     PopupMenu popup = new PopupMenu(v.getContext(), v);
                     popup.setOnMenuItemClickListener(itemMenuClickListener);
@@ -257,7 +254,7 @@ public class ExampleListTreeAdapter extends
                 @Override
                 public void onClick(View view) {
                     int nodePlaneIndex = getAdapterPosition();
-                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(nodePlaneIndex);
+                    ListTree.ItemNode node = tree.getNodeByPlaneIndex(nodePlaneIndex);
                     node.setChecked(!node.isChecked());
                     //改变所有的子孙们的状态
                     int count = tree.setDescendantChecked(nodePlaneIndex, node.isChecked());
