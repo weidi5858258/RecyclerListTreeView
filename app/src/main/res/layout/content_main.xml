@@ -12,7 +12,45 @@
 tools:context="niuedu.com.treeviewtest.MainActivity"
 tools:showIn="@layout/activity_main"-->
 
-    <com.niuedu.TwoDScrollView
+    <!--262dp-->
+
+    <LinearLayout
+        android:id="@+id/testlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listview"
+            android:layout_width="20262dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_green_light"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="262dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"/>
+
+        <LinearLayout
+            android:layout_width="2620dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_bright"/>
+
+    </LinearLayout>
+
+
+    <!--<com.niuedu.TwoDScrollView
         android:background="@android:color/holo_green_light"
         android:layout_width="262dp"
         android:layout_height="match_parent">
@@ -35,7 +73,7 @@ tools:showIn="@layout/activity_main"-->
 
         </LinearLayout>
 
-    </com.niuedu.TwoDScrollView>
+    </com.niuedu.TwoDScrollView>-->
 
     <!--<LinearLayout
         android:id="@+id/testlayout"
